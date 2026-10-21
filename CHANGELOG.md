@@ -15,3 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Runtime Agent Skills loader (agentskills.io spec validation) and the escalation-rules and scheduling-policy playbooks with evals.
 - Call state, structured handoff summary, EHR resilience wrapper (timeouts, failure counting, escalation hint) and speakable formatting.
 - Instruction builder (voice rules, practice facts, playbooks) and LLM-independent scheduling operations with confirmation and ownership guards.
+- Human Handoff agent publishing a structured summary (room data topic "handoff") and the LiveKit eval harness.

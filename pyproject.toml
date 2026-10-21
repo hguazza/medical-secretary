@@ -1,0 +1,62 @@
+[project]
+name = "medical-secretary"
+version = "0.0.0"
+description = "Voice AI front desk for physician practices, built with LiveKit Agents"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Henrique Guazzelli" }]
+requires-python = ">=3.13,<3.15"
+dependencies = [
+    "livekit-agents~=1.8",
+    "livekit-plugins-ai-coustics~=0.3",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.7",
+    "pyright>=1.1.390",
+    "types-pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/medical_secretary"]
+
+[tool.uv]
+# yarl 1.24.1 shipped only a cp310 wheel (see LiveKit agent-starter-python).
+constraint-dependencies = ["yarl<1.24"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "-m 'not evals'"
+markers = [
+    "evals: LLM-backed behavioral evals (need LiveKit credentials; cost money)",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+# ruff >=0.17 also formats Python code blocks inside Markdown; docs are not code.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "B", "A", "C4", "UP", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.13"
+typeCheckingMode = "basic"
+venvPath = "."
+venv = ".venv"

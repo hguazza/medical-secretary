@@ -1,0 +1,11 @@
+[
+  {"query": "let me talk to the agent real quick", "should_trigger": true},
+  {"query": "the agent keeps double-booking, can you step through a conversation and see what tools it calls", "should_trigger": true},
+  {"query": "deploy this to livekit cloud", "should_trigger": true},
+  {"query": "run the simulated callers", "should_trigger": true},
+  {"query": "set up my .env.local with the livekit keys", "should_trigger": true},
+  {"query": "add a new visit type to the dermatology practice", "should_trigger": false},
+  {"query": "write a unit test for find_slots clamping", "should_trigger": false},
+  {"query": "explain how agentskills progressive disclosure works", "should_trigger": false},
+  {"query": "cut a release", "should_trigger": false}
+]

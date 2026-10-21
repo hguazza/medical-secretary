@@ -1,0 +1,10 @@
+[
+  {"query": "let's ship 0.1.0", "should_trigger": true},
+  {"query": "bump the version and tag it", "should_trigger": true},
+  {"query": "can you prep release notes for the new minor version", "should_trigger": true},
+  {"query": "we fixed the timeout bug, cut a patch release", "should_trigger": true},
+  {"query": "add an entry to the changelog for the new eval", "should_trigger": false},
+  {"query": "deploy the agent to livekit cloud", "should_trigger": false},
+  {"query": "what version of livekit-agents are we on?", "should_trigger": false},
+  {"query": "upgrade pydantic to the latest version", "should_trigger": false}
+]

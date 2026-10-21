@@ -1,0 +1,33 @@
+{
+  "skill_name": "scheduling-policy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Can I bring Emma in sometime this week for her cough?",
+      "expected_output": "Treats it as a sick visit and offers up to three concrete times with day, date, time and provider.",
+      "assertions": [
+        "Uses the sick visit type",
+        "Offers no more than three options",
+        "Does not read out slot ids"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Earlier you offered me Tuesday, November 3rd at 8:00 AM with Dr. Priya Patel for Emma's sick visit. Yeah, I guess that one is fine?",
+      "expected_output": "Does not treat the hesitant 'I guess' as a yes: reads back the details (day, time, provider, visit type) and asks for a clear yes instead of booking.",
+      "assertions": [
+        "Reads back day, time and provider",
+        "Does not book in this turn"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Can I book a sick visit for Emma sometime next March?",
+      "expected_output": "Explains the date is beyond the booking window and steers to what can be booked: offers the earliest available times inside the window, or offers to search them.",
+      "assertions": [
+        "Mentions the booking window or that it can't book that far out",
+        "Offers an alternative inside the booking window"
+      ]
+    }
+  ]
+}

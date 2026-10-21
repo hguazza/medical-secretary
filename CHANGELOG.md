@@ -17,3 +17,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scheduling agent (find, book, list, reschedule, cancel) with VerifyIdentity task, confirmation guard and escalation on repeated EHR failures.
 - Instruction builder (voice rules, practice facts, playbooks) and LLM-independent scheduling operations with confirmation and ownership guards.
 - Human Handoff agent publishing a structured summary (room data topic "handoff") and the LiveKit eval harness.
+- Front Desk agent: red-flag triage, practice info, routing to Scheduling or staff; runtime-skill A/B eval.

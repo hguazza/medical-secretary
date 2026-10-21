@@ -1,0 +1,10 @@
+[
+  {"query": "we're onboarding a family medicine clinic in Montpelier, set it up", "should_trigger": true},
+  {"query": "Dr. Kim left the dermatology practice", "should_trigger": true},
+  {"query": "pediatrics is closed on saturdays starting next month", "should_trigger": true},
+  {"query": "billing questions at the derm clinic should go to the office manager", "should_trigger": true},
+  {"query": "the agent mispronounces Dr. Nguyen's name", "should_trigger": false},
+  {"query": "add a refill agent", "should_trigger": false},
+  {"query": "run the evals for dermatology", "should_trigger": false},
+  {"query": "what does the practice YAML schema look like in pydantic", "should_trigger": false}
+]

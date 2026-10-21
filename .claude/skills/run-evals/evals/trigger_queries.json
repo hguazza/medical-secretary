@@ -1,0 +1,10 @@
+[
+  {"query": "did my prompt change break anything?", "should_trigger": true},
+  {"query": "the agent offered a time with a doctor who left, add a test so it never happens again", "should_trigger": true},
+  {"query": "why is test_red_flag_mid_scheduling failing", "should_trigger": true},
+  {"query": "check if the escalation playbook actually helps", "should_trigger": true},
+  {"query": "run the linter", "should_trigger": false},
+  {"query": "talk to the agent by voice", "should_trigger": false},
+  {"query": "add a pediatrics practice in Montpelier", "should_trigger": false},
+  {"query": "bump version to 0.2.0", "should_trigger": false}
+]

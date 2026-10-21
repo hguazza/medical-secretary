@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FHIR-shaped mock EHR with deterministic seed data and fault injection (latency, timeouts, outages, stale providers, no slots).
 - Runtime Agent Skills loader (agentskills.io spec validation) and the escalation-rules and scheduling-policy playbooks with evals.
 - Call state, structured handoff summary, EHR resilience wrapper (timeouts, failure counting, escalation hint) and speakable formatting.
+- Instruction builder (voice rules, practice facts, playbooks) and LLM-independent scheduling operations with confirmation and ownership guards.

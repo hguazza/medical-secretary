@@ -102,6 +102,20 @@ async def start_session(
         yield session
 
 
+def final_message(result: RunResult):
+    """Expectation handle for the last assistant message of a run.
+
+    Scheduling says a holding phrase before tool calls, so the first message
+    of a run is not the substantive answer.
+    """
+    last = max(
+        i
+        for i, e in enumerate(result.events)
+        if e.type == "message" and e.item.role == "assistant"
+    )
+    return result.expect[last].is_message(role="assistant")
+
+
 def called(result: RunResult, name: str) -> bool:
     try:
         result.expect.contains_function_call(name=name)

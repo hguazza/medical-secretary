@@ -22,11 +22,11 @@
     },
     {
       "id": 3,
-      "prompt": "Can I book something for next March?",
-      "expected_output": "Explains the date is beyond the booking window and offers the latest available times instead.",
+      "prompt": "Can I book a sick visit for Emma sometime next March?",
+      "expected_output": "Explains the date is beyond the booking window and steers to what can be booked: offers the earliest available times inside the window, or offers to search them.",
       "assertions": [
         "Mentions the booking window or that it can't book that far out",
-        "Offers alternatives"
+        "Offers an alternative inside the booking window"
       ]
     }
   ]

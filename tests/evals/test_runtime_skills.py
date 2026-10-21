@@ -9,7 +9,7 @@ from medical_secretary.agents.front_desk import FrontDeskAgent
 from medical_secretary.agents.scheduling import SchedulingAgent
 from medical_secretary.session_state import CallState
 from medical_secretary.skills_runtime.loader import SKILLS_DIR
-from tests.evals.conftest import make_state, start_session
+from tests.evals.conftest import final_message, make_state, start_session
 
 # skill name -> (builds the agent the skill is meant for, whether the caller is verified)
 AgentFactory = Callable[[CallState, tuple[str, ...]], Agent]
@@ -37,17 +37,8 @@ async def _passes(
         intent = case["expected_output"] + " " + " ".join(case["assertions"])
         try:
             if verified:
-                # tool-using agent: the first message may be a holding phrase, so judge the last one
-                last = max(
-                    i
-                    for i, e in enumerate(result.events)
-                    if e.type == "message" and e.item.role == "assistant"
-                )
-                await (
-                    result.expect[last]
-                    .is_message(role="assistant")
-                    .judge(judge, intent=intent)
-                )
+                # tool-using agent: the first message may be a holding phrase
+                await final_message(result).judge(judge, intent=intent)
             else:
                 await result.expect.contains_message(role="assistant").judge(
                     judge, intent=intent

@@ -18,3 +18,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Instruction builder (voice rules, practice facts, playbooks) and LLM-independent scheduling operations with confirmation and ownership guards.
 - Human Handoff agent publishing a structured summary (room data topic "handoff") and the LiveKit eval harness.
 - Front Desk agent: red-flag triage, practice info, routing to Scheduling or staff; runtime-skill A/B eval.
+- AgentServer entrypoint with LiveKit Inference STT/LLM/TTS, turn detector, noise cancellation and per-room practice selection via job metadata.

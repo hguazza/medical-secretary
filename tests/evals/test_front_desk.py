@@ -22,6 +22,17 @@ async def test_routes_scheduling_intent(practice_id: str) -> None:
 
 
 @pytest.mark.parametrize("practice_id", PRACTICES)
+async def test_mild_symptom_visit_goes_to_scheduling(practice_id: str) -> None:
+    state = make_state(practice_id)
+    async with start_session(FrontDeskAgent(state), state) as session:
+        result = await session.run(
+            user_input="Hi, sorry, I need to get my daughter seen, she's had this cough."
+        )
+        assert handed_off(result, SchedulingAgent)
+        assert not handed_off(result, HumanHandoffAgent)
+
+
+@pytest.mark.parametrize("practice_id", PRACTICES)
 async def test_refill_is_declined_honestly(practice_id: str, judge: llm.LLM) -> None:
     state = make_state(practice_id)
     async with start_session(FrontDeskAgent(state), state) as session:

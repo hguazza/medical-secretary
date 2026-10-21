@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -69,6 +70,8 @@ async def start_session(
         AgentSession[CallState](llm=agent_llm, userdata=state) as session,
     ):
         await session.start(agent)
+        # let an on_enter AgentTask take over the activity before the first run()
+        await asyncio.sleep(1)
         yield session
 
 

@@ -10,3 +10,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Project scaffold: uv, ruff, pyright, pytest, Makefile, CI, ADRs 0001–0003.
+- Practice templates (pediatrics, dermatology) with validated schema and env-based settings.

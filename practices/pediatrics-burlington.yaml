@@ -1,0 +1,33 @@
+id: pediatrics-burlington
+name: Lake Champlain Pediatrics
+timezone: America/New_York
+phone: "802-555-0142"
+address: 120 Pearl Street, Burlington, Vermont
+hours:
+  mon: { open: "08:00", close: "17:00" }
+  tue: { open: "08:00", close: "17:00" }
+  wed: { open: "08:00", close: "17:00" }
+  thu: { open: "08:00", close: "17:00" }
+  fri: { open: "08:00", close: "17:00" }
+  sat: { open: "09:00", close: "12:00" }
+greeting: Thanks for calling Lake Champlain Pediatrics, this is the virtual front desk. How can I help you today?
+tone: Warm and reassuring; callers are often worried parents. Use the child's first name once known.
+providers:
+  - { id: dr-patel, name: Dr. Priya Patel, specialty: Pediatrics }
+  - { id: dr-nguyen, name: Dr. Michael Nguyen, specialty: Pediatrics }
+  - { id: np-okafor, name: Grace Okafor, specialty: Pediatric Nurse Practitioner, accepts_new_patients: false }
+visit_types:
+  - { code: well-child, label: Well-child checkup, duration_min: 30 }
+  - { code: sick, label: Sick visit, duration_min: 20 }
+  - { code: follow-up, label: Follow-up visit, duration_min: 15, new_patient_allowed: false }
+booking_window_days: 30
+escalation:
+  default_team: front-desk
+  urgent_contact: the on-call nurse
+  routes:
+    - { reason: clinical, team: nurse-line }
+    - { reason: billing, team: billing }
+    - { reason: records, team: front-desk }
+    - { reason: scheduling, team: front-desk }
+skills: [escalation-rules, scheduling-policy]
+out_of_scope_message: I'm not able to help with that over the phone yet, but I can connect you with our staff.

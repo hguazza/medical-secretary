@@ -1,0 +1,30 @@
+id: dermatology-demo
+name: Green Mountain Dermatology
+timezone: America/New_York
+phone: "802-555-0199"
+address: 45 Church Street, Burlington, Vermont
+hours:
+  mon: { open: "08:00", close: "16:30" }
+  tue: { open: "08:00", close: "16:30" }
+  wed: { open: "08:00", close: "16:30" }
+  thu: { open: "08:00", close: "16:30" }
+  fri: { open: "08:00", close: "12:00" }
+greeting: Thank you for calling Green Mountain Dermatology. I'm the virtual assistant. What can I do for you?
+tone: Calm, efficient and professional; callers are mostly adults managing their own care.
+providers:
+  - { id: dr-reyes, name: Dr. Ana Reyes, specialty: Dermatology }
+  - { id: dr-kim, name: Dr. Daniel Kim, specialty: Dermatology }
+visit_types:
+  - { code: skin-check, label: Full skin check, duration_min: 30 }
+  - { code: mole-eval, label: Mole evaluation, duration_min: 20 }
+  - { code: acne-follow-up, label: Acne follow-up, duration_min: 15, new_patient_allowed: false }
+booking_window_days: 45
+escalation:
+  default_team: front-desk
+  urgent_contact: the clinical team
+  routes:
+    - { reason: clinical, team: medical-assistants }
+    - { reason: billing, team: billing }
+    - { reason: scheduling, team: front-desk }
+skills: [escalation-rules, scheduling-policy]
+out_of_scope_message: That's something our staff will need to help with. I can transfer you now.

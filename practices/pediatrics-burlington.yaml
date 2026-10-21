@@ -30,4 +30,4 @@ escalation:
     - { reason: records, team: front-desk }
     - { reason: scheduling, team: front-desk }
 skills: [escalation-rules, scheduling-policy]
-out_of_scope_message: I'm not able to help with that over the phone yet, but I can connect you with our staff.
+out_of_scope_message: I'm not able to help with that over the phone yet, so I'm connecting you with our staff.

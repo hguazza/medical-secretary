@@ -27,4 +27,4 @@ escalation:
     - { reason: billing, team: billing }
     - { reason: scheduling, team: front-desk }
 skills: [escalation-rules, scheduling-policy]
-out_of_scope_message: That's something our staff will need to help with. I can transfer you now.
+out_of_scope_message: That's something our staff will need to help with, so I'm transferring you now.

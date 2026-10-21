@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Literal
 
 from livekit.agents import Agent, ChatContext, RunContext, function_tool
@@ -14,18 +15,24 @@ from medical_secretary.tasks.verify_identity import VerifyIdentityTask
 
 ROLE = """\
 # Your role: scheduling
-You help a verified patient book, reschedule, check or cancel appointments. Use the tools for every fact about availability or appointments. Convert dates the caller says into YYYY-MM-DD using today's date, and when the caller names a visit type and a time frame such as this week or next week, call find_slots right away instead of asking to confirm the dates. If a provider the caller names is not in the practice facts or find_slots reports the provider is unavailable, say so and offer the other providers. Before booking, rescheduling or cancelling, read back the details and set caller_confirmed to true only after a clear yes. For anything that isn't scheduling, or if the caller wants a person, call route_to_human."""
+You help a verified patient book, reschedule, check or cancel appointments. Use the tools for every fact about availability or appointments. Convert dates the caller says into YYYY-MM-DD using today's date, and when the caller names a visit type and a time frame such as this week or next week, call find_slots right away instead of asking to confirm the dates. If a provider the caller names is not in the practice facts or find_slots reports the provider is unavailable, say so and offer the other providers. Before calling a scheduling tool, say one short holding phrase such as "One moment while I check." Before booking, rescheduling or cancelling, read back the details and set caller_confirmed to true only after a clear yes. If the caller asks for a person, call route_to_human right away; do not ask why or try to help first. For anything else that isn't scheduling, also call route_to_human."""
 
 
 class SchedulingAgent(Agent):
-    SKILLS = ("escalation-rules", "scheduling-policy")
+    SKILLS: tuple[str, ...] = ("escalation-rules", "scheduling-policy")
 
-    def __init__(self, state: CallState, chat_ctx: ChatContext | None = None) -> None:
+    def __init__(
+        self,
+        state: CallState,
+        chat_ctx: ChatContext | None = None,
+        skills: Sequence[str] | None = None,
+    ) -> None:
         self._state = state
+        self._skills = self.SKILLS if skills is None else tuple(skills)
         super().__init__(instructions=self._compose(), chat_ctx=chat_ctx)
 
     def _compose(self) -> str:
-        instructions = build_instructions(ROLE, self._state, self.SKILLS)
+        instructions = build_instructions(ROLE, self._state, self._skills)
         caller = self._state.caller
         if caller is None:
             return instructions
@@ -43,13 +50,20 @@ class SchedulingAgent(Agent):
                 chat_ctx=self.chat_ctx.copy(exclude_instructions=True)
             )
             if result.caller is None:
-                state.record("identity not verified")
+                if result.outcome == "system_error":
+                    state.record("identity lookup unavailable")
+                    reason = "system_error"
+                    summary = "The scheduling system was unavailable during identity lookup; the caller was not verified."
+                else:
+                    state.record("identity not verified")
+                    reason = "identity_not_verified"
+                    summary = "Could not verify the patient's identity by name and date of birth."
                 self.session.update_agent(
                     HumanHandoffAgent(
                         state,
-                        reason="identity_not_verified",
+                        reason=reason,
                         priority="routine",
-                        summary="Could not verify the patient's identity by name and date of birth.",
+                        summary=summary,
                         chat_ctx=self.chat_ctx.copy(exclude_instructions=True),
                     )
                 )

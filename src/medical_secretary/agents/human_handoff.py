@@ -50,7 +50,10 @@ class HumanHandoffAgent(Agent):
         )
         state.handoff = handoff
         logger.info("human handoff", extra={"handoff": handoff.to_dict()})
-        await publish_handoff(handoff)
+        try:
+            await publish_handoff(handoff)
+        except Exception:
+            logger.exception("failed to publish handoff summary")
         self.session.generate_reply(
             instructions=f"Tell the caller you're connecting them with the {handoff.team.replace('-', ' ')} team now."
         )

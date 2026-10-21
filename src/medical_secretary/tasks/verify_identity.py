@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from typing import Literal
 
 from livekit.agents import (
     NOT_GIVEN,
@@ -24,10 +25,17 @@ INSTRUCTIONS = f"""{BASE_RULES}
 Collect the patient's full name and date of birth. The caller may be a parent calling for a child; you need the patient's details, not the caller's. Read the date of birth back and get a yes, then call submit_identity. Do nothing else until the patient is verified."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class IdentityResult:
     caller: VerifiedCaller | None
+    outcome: Literal["verified", "no_match", "system_error"]
+
+
+@dataclass(frozen=True)
+class IdentityDecision:
     attempts: int
+    text: str | None  # tool output when the task continues
+    final: IdentityResult | None  # set when the task is complete
 
 
 async def check_identity(
@@ -50,9 +58,30 @@ async def check_identity(
     return VerifiedCaller(patient.id, patient.full_name, patient.birth_date)
 
 
-class VerifyIdentityTask(AgentTask[IdentityResult]):
-    MAX_ATTEMPTS = 2
+MAX_ATTEMPTS = 2
 
+
+def decide_identity(
+    result: VerifiedCaller | str, attempts: int, tool_failures: int
+) -> IdentityDecision:
+    """Pure decision for one submit_identity call: complete the task or continue."""
+    if isinstance(result, VerifiedCaller):
+        return IdentityDecision(attempts + 1, None, IdentityResult(result, "verified"))
+    if result == "NO_MATCH":
+        attempts += 1
+        if attempts >= MAX_ATTEMPTS:
+            return IdentityDecision(attempts, None, IdentityResult(None, "no_match"))
+        return IdentityDecision(
+            attempts,
+            "NO_MATCH: no patient matched. Ask the caller to spell the last name and repeat the date of birth.",
+            None,
+        )
+    if not result.startswith("ERROR bad_date") and tool_failures >= MAX_TOOL_FAILURES:
+        return IdentityDecision(attempts, None, IdentityResult(None, "system_error"))
+    return IdentityDecision(attempts, result, None)
+
+
+class VerifyIdentityTask(AgentTask[IdentityResult]):
     def __init__(self, chat_ctx: NotGivenOr[ChatContext] = NOT_GIVEN) -> None:
         super().__init__(instructions=INSTRUCTIONS, chat_ctx=chat_ctx)
         self._attempts = 0
@@ -74,17 +103,8 @@ class VerifyIdentityTask(AgentTask[IdentityResult]):
         """
         state = context.userdata
         result = await check_identity(state, full_name, birth_date)
-        if isinstance(result, VerifiedCaller):
-            self._attempts += 1
-            self.complete(IdentityResult(result, self._attempts))
-            return None
-        if result == "NO_MATCH":
-            self._attempts += 1
-            if self._attempts >= self.MAX_ATTEMPTS:
-                self.complete(IdentityResult(None, self._attempts))
-                return None
-            return "NO_MATCH: no patient matched. Ask the caller to spell the last name and repeat the date of birth."
-        if state.tool_failures >= MAX_TOOL_FAILURES:
-            self.complete(IdentityResult(None, self._attempts))
-            return None
-        return result
+        decision = decide_identity(result, self._attempts, state.tool_failures)
+        self._attempts = decision.attempts
+        if decision.final is not None:
+            self.complete(decision.final)
+        return decision.text

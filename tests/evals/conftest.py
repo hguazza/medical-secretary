@@ -61,6 +61,33 @@ def make_state(
     return state
 
 
+async def wait_for_on_enter(
+    session: AgentSession[CallState], timeout_s: float = 30.0
+) -> None:
+    """Wait until the agent's on_enter speech (and any AgentTask it started) is done.
+
+    Speech is created asynchronously after start(), so require the session to
+    stay free of pending speech for a short settle period before the first run().
+    """
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + timeout_s
+    idle_since: float | None = None
+    await asyncio.sleep(0.5)
+    while loop.time() < deadline:
+        speech = session.current_speech
+        if speech is not None and not speech.done():
+            idle_since = None
+            await asyncio.wait_for(
+                speech.wait_for_playout(), max(deadline - loop.time(), 0.1)
+            )
+            continue
+        now = loop.time()
+        idle_since = now if idle_since is None else idle_since
+        if now - idle_since >= 0.5:
+            return
+        await asyncio.sleep(0.1)
+
+
 @asynccontextmanager
 async def start_session(
     agent: Agent, state: CallState
@@ -70,8 +97,8 @@ async def start_session(
         AgentSession[CallState](llm=agent_llm, userdata=state) as session,
     ):
         await session.start(agent)
-        # let an on_enter AgentTask take over the activity before the first run()
-        await asyncio.sleep(1)
+        # let on_enter speech / an on_enter AgentTask settle before the first run()
+        await wait_for_on_enter(session)
         yield session
 
 

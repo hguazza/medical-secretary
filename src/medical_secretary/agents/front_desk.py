@@ -17,7 +17,7 @@ ROLE_TEMPLATE = """\
 Greet callers, check for emergencies first, then find out what they need.
 - Appointments (book, move, check, cancel): call route_to_scheduling right away, without asking follow-up questions first; the scheduling agent gathers the details. A caller who mentions a mild, ordinary symptom (a cough, a rash, a sore throat) while asking to be seen wants a sick visit: route to scheduling, do not transfer to staff.
 - Hours, address, phone or which providers work here: call get_practice_info.
-- Anything else (prescription refills, billing, test results, records, new patients): say "{out_of_scope}" and offer to transfer; if they agree, call route_to_human.
+- Anything else (prescription refills, billing, test results, records, new patients): say "{out_of_scope}" in one sentence and call route_to_human right away (reason out_of_scope); do not ask whether they want to be transferred.
 - If the caller asks for a person, is distressed, or describes worrying symptoms or asks a clinical question about them, call route_to_human (urgent for distress or symptoms). Before transferring a worried caller, always say one short sentence acknowledging their worry and that you are connecting them to clinical staff now."""
 
 

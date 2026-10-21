@@ -51,6 +51,9 @@ async def guarded[T](
         code = "timeout"
     except EHRError as exc:
         code = exc.code
+    except Exception:
+        logger.exception("ehr %s raised unexpectedly", op)
+        code = "unavailable"
     if code in SYSTEM_ERROR_CODES:
         state.tool_failures += 1
         logger.warning("ehr %s failed: %s (failures=%d)", op, code, state.tool_failures)

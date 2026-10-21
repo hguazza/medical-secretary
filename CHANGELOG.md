@@ -21,3 +21,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simulated-caller scenarios (anxious parent, rambler, emergency, bad connection, interrupter) and an on-demand Evals workflow.
 - AgentServer entrypoint with LiveKit Inference STT/LLM/TTS, turn detector, noise cancellation and per-room practice selection via job metadata.
 - Dev Agent Skills (livekit-dev, run-evals, release, add-practice) with trigger eval queries; LiveKit official skills installed via lk skills install.
+- README with demo script, architecture diagram and known limitations.

@@ -1,6 +1,6 @@
 [project]
 name = "medical-secretary"
-version = "0.0.0"
+version = "0.1.0"
 description = "Voice AI front desk for physician practices, built with LiveKit Agents"
 readme = "README.md"
 license = "MIT"

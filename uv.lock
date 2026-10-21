@@ -768,7 +768,7 @@ wheels = [
 
 [[package]]
 name = "medical-secretary"
-version = "0.0.0"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "livekit-agents" },

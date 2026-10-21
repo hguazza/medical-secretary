@@ -3,15 +3,21 @@ name: Evals
 on:
   workflow_dispatch:
   pull_request:
-    types: [labeled, synchronize]
+    # Labeling is a one-shot trigger (no synchronize): remove and re-add `run-evals` to rerun.
+    types: [labeled]
 
 permissions:
   contents: read
+
+concurrency:
+  group: evals-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   evals:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'run-evals')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
       LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
@@ -24,5 +30,6 @@ jobs:
       - run: uv sync --locked
       - run: uv run pytest -m evals -v
       - run: uv run -m livekit.agents download-files
+      # The install script always fetches the latest release and cannot be pinned (developed against lk 2.19.1).
       - run: curl -sSL https://get.livekit.io/cli | bash
       - run: lk agent simulate text --scenarios scenarios.yaml --yes

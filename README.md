@@ -13,7 +13,7 @@ brew install livekit-cli
 lk cloud auth
 lk app env -w            # writes .env.local with LiveKit Cloud credentials
 make install
-uv run python src/agent.py download-files   # turn detector + noise cancellation models
+uv run -m livekit.agents download-files   # turn detector + noise cancellation models
 make console-text        # talk to the agent by typing
 make console             # or by voice
 ```
@@ -25,7 +25,7 @@ Pick a practice with `PRACTICE_ID=dermatology-demo make console-text` (default: 
 Run `make console` (voice) or `make console-text` with the default pediatrics practice. The mock EHR is seeded with these patients (name, date of birth): Emma Johnson 2018-03-05, Liam Garcia 2015-11-20, Olivia Smith 1984-07-14. Wording does not need to match exactly; this is the shape of each call.
 
 1. **Book a sick visit.** Say: "Hi, my daughter has a cough and I'd like to bring her in this week." Front Desk routes to Scheduling, which asks you to verify identity: "Emma Johnson, March 5th, 2018." It offers real open slots, and after you pick one and say yes to the read-back, it books and confirms. The booking only happens after an explicit confirmation.
-2. **Stale provider.** Ask for "Dr. Smith". Expected: the agent says that provider is not at the practice and offers Dr. Patel or Dr. Nguyen instead. A provider that exists in the practice file but has gone stale in the EHR gets the same treatment (it is reported unavailable and alternatives are offered). The stale-in-EHR case needs fault injection, so it is demonstrated by the evals (`Faults(stale_practitioner_ids=...)`), not the live console.
+2. **Stale provider.** Ask for "Dr. Jones". Expected: the agent says that provider is not at the practice and offers Dr. Patel or Dr. Nguyen instead. A provider that exists in the practice file but has gone stale in the EHR gets the same treatment (it is reported unavailable and alternatives are offered). The stale-in-EHR case needs fault injection, so it is demonstrated by the evals (`Faults(stale_practitioner_ids=...)`), not the live console.
 3. **EHR outage then staff.** Expected: after two system failures the agent stops retrying, apologizes and transfers to staff with a summary. The live console has no switch for faults, so this is demonstrated by the evals (`Faults(fail_ops=...)`) and unit tests of the resilience wrapper. You can see the same escalation live by failing identity verification twice (give a wrong name or birth date two times): the agent hands off to staff.
 4. **Refill request, honest decline.** Say: "I need a refill on my son's prescription." Expected: the agent says it can't help with that over the phone yet and offers to connect you to staff; it does not pretend to process the refill. Say yes and it hands off.
 5. **Emergency.** Say: "My baby is having trouble breathing." Expected: immediately, "This could be an emergency. Please hang up and call 911 right now." No booking, no transfer, no questions first.
@@ -72,7 +72,7 @@ The repo uses the [Agent Skills](https://agentskills.io) format in two places, k
 | LLM evals | Behavior of each agent and runtime skill using LiveKit's eval harness; needs credentials and costs money | `make evals` |
 | Simulations | Simulated callers from `scenarios.yaml` (anxious parent, rambler, emergency, bad connection, interrupter) on LiveKit Cloud | `make simulate` |
 
-`make check` runs ruff, pyright and the unit tests, and is what CI runs on every push. Evals and simulations run on demand through the Evals GitHub workflow.
+`make check` runs ruff, pyright and the unit tests, and is what CI runs on pull requests and pushes to main. Evals and simulations run through the Evals GitHub workflow, manually or when the `run-evals` label is added to a PR.
 
 ## Development
 
@@ -88,6 +88,9 @@ The repo uses the [Agent Skills](https://agentskills.io) format in two places, k
 - **Mock EHR only.** All data is synthetic; no real PHI, no real EHR integration.
 - **English only.**
 - **Refills, billing and test results are out of scope** and are declined and handed to staff.
+- **Handoff summaries contain PHI-shaped data.** The summary includes the caller's name and is broadcast to all room participants and logged at INFO. Acceptable with synthetic data; it must be restricted before any real PHI.
+- **Evals coverage.** Full-conversation JudgeGroup evals are not yet added (turn-level judges plus simulations cover quality).
+- **Practice selection** reads job metadata (or `PRACTICE_ID`), not room metadata.
 - Fault scenarios (stale provider, EHR outage) are exercised by the evals, not switchable from the live console.
 
 ## Roadmap

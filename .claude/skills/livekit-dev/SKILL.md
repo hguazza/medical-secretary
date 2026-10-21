@@ -9,7 +9,7 @@ The agent entrypoint is `src/agent.py`, which loads `medical_secretary.server`. 
 
 ## Setup (once)
 - `lk cloud auth` (the user runs it, because it opens a browser), then `lk app env -w` to write `.env.local`.
-- `uv run python src/agent.py download-files` to fetch the turn detector and noise cancellation models.
+- `uv run -m livekit.agents download-files` to fetch the turn detector and noise cancellation models.
 
 ## Talk to it
 - By text, quickly: `make console-text`. By voice: `make console`. To change practice: `PRACTICE_ID=dermatology-demo make console-text`.

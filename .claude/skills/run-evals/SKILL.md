@@ -18,7 +18,7 @@ There are three tiers, from cheapest to most expensive. Run the cheapest tier th
 - Fix the root cause, then run the whole eval tier again.
 
 ## Runtime skills
-`tests/evals/test_runtime_skills.py` runs every case in a skill's `evals/evals.json` with and without the skill. When you edit a playbook in `skills/`, rerun it. The skill must pass all its cases and must not do worse than the baseline.
+`tests/evals/test_runtime_skills.py` runs every case in each skill's `evals/evals.json` with and without the skill (escalation-rules against Front Desk, scheduling-policy against Scheduling with a verified caller). Cases must be self-contained single prompts. When you edit a playbook in `skills/`, rerun it. The skill must pass all its cases and must not do worse than the baseline.
 
 ## Reading a failure
 - A judge failure: print the transcript with `-s` and decide whether the agent was wrong or the intent was too strict. Fix whichever is wrong, and say which in the commit message.

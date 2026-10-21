@@ -9,6 +9,7 @@ from livekit.agents import Agent, ChatContext, RunContext, function_tool
 
 from medical_secretary import scheduling_ops as ops
 from medical_secretary.agents.human_handoff import HumanHandoffAgent
+from medical_secretary.handoff import HandoffReason, SchedulingHandoffReason
 from medical_secretary.prompts import build_instructions
 from medical_secretary.session_state import CallState
 from medical_secretary.tasks.verify_identity import VerifyIdentityTask
@@ -50,6 +51,7 @@ class SchedulingAgent(Agent):
                 chat_ctx=self.chat_ctx.copy(exclude_instructions=True)
             )
             if result.caller is None:
+                reason: HandoffReason
                 if result.outcome == "system_error":
                     state.record("identity lookup unavailable")
                     reason = "system_error"
@@ -160,14 +162,14 @@ class SchedulingAgent(Agent):
     async def route_to_human(
         self,
         context: RunContext[CallState],
-        reason: str,
+        reason: SchedulingHandoffReason,
         priority: Literal["routine", "urgent"],
         summary: str,
     ) -> HumanHandoffAgent:
         """Transfer the caller to practice staff.
 
         Args:
-            reason: One of clinical, billing, records, scheduling, caller_request, system_error, out_of_scope.
+            reason: clinical for symptoms, distress or clinical questions; caller_request when they ask for a person; system_error when the scheduling system keeps failing; out_of_scope for requests you don't handle.
             priority: urgent for distress or worrying symptoms, otherwise routine.
             summary: Two sentences for staff: who is calling, what they need, what was already done.
         """

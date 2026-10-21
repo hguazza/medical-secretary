@@ -6,7 +6,13 @@ import logging
 
 from livekit.agents import Agent, ChatContext, get_job_context
 
-from medical_secretary.handoff import HandoffSummary, Priority, build_handoff_summary
+from medical_secretary.handoff import (
+    HandoffReason,
+    HandoffSummary,
+    Priority,
+    build_handoff_summary,
+    transfer_announcement,
+)
 from medical_secretary.prompts import build_instructions
 from medical_secretary.session_state import CallState
 
@@ -31,7 +37,7 @@ class HumanHandoffAgent(Agent):
     def __init__(
         self,
         state: CallState,
-        reason: str,
+        reason: HandoffReason,
         priority: Priority,
         summary: str,
         chat_ctx: ChatContext | None = None,
@@ -39,7 +45,7 @@ class HumanHandoffAgent(Agent):
         super().__init__(
             instructions=build_instructions(ROLE, state, []), chat_ctx=chat_ctx
         )
-        self._reason = reason
+        self._reason: HandoffReason = reason
         self._priority: Priority = priority
         self._summary = summary
 
@@ -55,5 +61,5 @@ class HumanHandoffAgent(Agent):
         except Exception:
             logger.exception("failed to publish handoff summary")
         self.session.generate_reply(
-            instructions=f"Tell the caller you're connecting them with the {handoff.team.replace('-', ' ')} team now."
+            instructions=transfer_announcement(handoff, state.practice)
         )

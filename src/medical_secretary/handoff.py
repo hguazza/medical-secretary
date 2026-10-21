@@ -7,9 +7,18 @@ from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
+    from medical_secretary.config import Practice
     from medical_secretary.session_state import CallState
 
 Priority = Literal["routine", "urgent"]
+
+# Reasons the agents may pass to route_to_human. A closed set, so a model
+# cannot invent a reason that silently falls through to the default team.
+AgentHandoffReason = Literal[
+    "clinical", "billing", "records", "scheduling", "caller_request", "out_of_scope"
+]
+SchedulingHandoffReason = Literal[AgentHandoffReason, "system_error"]
+HandoffReason = Literal[SchedulingHandoffReason, "identity_not_verified"]
 
 
 @dataclass
@@ -18,7 +27,7 @@ class HandoffSummary:
     verified: bool
     intent: str | None
     actions_taken: list[str]
-    reason: str
+    reason: HandoffReason
     priority: Priority
     team: str
     summary: str
@@ -31,7 +40,7 @@ class HandoffSummary:
 
 
 def build_handoff_summary(
-    state: CallState, reason: str, priority: Priority, summary: str
+    state: CallState, reason: HandoffReason, priority: Priority, summary: str
 ) -> HandoffSummary:
     return HandoffSummary(
         caller_name=state.caller.full_name if state.caller else None,
@@ -43,3 +52,22 @@ def build_handoff_summary(
         team=state.practice.team_for(reason),
         summary=summary,
     )
+
+
+def transfer_announcement(summary: HandoffSummary, practice: Practice) -> str:
+    """Instructions for what the caller hears when the transfer happens.
+
+    The routing agent says nothing before transferring, so this is the only
+    place the caller is told; keeping it here means saying "I'm connecting
+    you" and actually connecting are one step.
+    """
+    team = summary.team.replace("-", " ")
+    parts: list[str] = []
+    if summary.priority == "urgent":
+        parts.append(
+            "Start with one short, warm sentence acknowledging that the caller is worried."
+        )
+    if summary.reason == "out_of_scope":
+        parts.append(f'Say: "{practice.out_of_scope_message}"')
+    parts.append(f"Tell the caller you're connecting them with the {team} team now.")
+    return " ".join(parts)

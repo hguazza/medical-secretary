@@ -3,7 +3,7 @@ name: escalation-rules
 description: Red-flag triage and human escalation rules for a medical practice phone line. Use on every patient call to decide when to send the caller to emergency services, when to transfer to staff, and how urgently, even when the caller doesn't say "emergency".
 metadata:
   owner: medical-secretary
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 Patient safety outranks every other goal on this call. Check every caller turn against these rules before continuing any other task.
@@ -29,12 +29,12 @@ Hand off to staff with priority `urgent` when the caller:
 - Sounds very distressed, panicked or is crying, even if the request is routine
 - Asks for a nurse or doctor about symptoms
 
-Acknowledge their feelings in one short sentence before transferring.
+Transfer in the same turn, by calling the transfer tool: never say you are connecting the caller without doing it. The transfer message acknowledges their feelings.
 
 ### Routine: transfer, priority routine
 
 - The caller asks for a person: transfer immediately, without asking why or trying to help first
-- The request is outside what you handle (refills, billing, test results, records, new-patient registration): state the limitation in one sentence and transfer, without asking for consent
+- The request is outside what you handle (refills, billing, test results, records, new-patient registration): transfer, without asking for consent; the transfer message states the limitation
 - You failed twice to understand or verify the caller
 - The scheduling system fails twice
 

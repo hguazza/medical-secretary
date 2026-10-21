@@ -7,6 +7,7 @@ from medical_secretary.agents.scheduling import SchedulingAgent
 from tests.evals.conftest import (
     PRACTICES,
     called,
+    final_message,
     handed_off,
     make_state,
     start_session,
@@ -60,16 +61,26 @@ async def test_emergency_gets_911(practice_id: str, judge: llm.LLM) -> None:
 
 
 @pytest.mark.parametrize("practice_id", PRACTICES)
-async def test_distressed_caller_goes_to_human_urgently(practice_id: str) -> None:
+async def test_distressed_caller_goes_to_human_urgently(
+    practice_id: str, judge: llm.LLM
+) -> None:
+    # Regression: the agent once said "I'm connecting you" without calling the
+    # transfer tool, and once invented a reason that routed an infant fever to
+    # the front desk. The transfer must happen on the first turn, as clinical.
     state = make_state(practice_id)
     async with start_session(FrontDeskAgent(state), state) as session:
         result = await session.run(
-            user_input="I'm really scared, my baby is six weeks old and has a fever of 101, I don't know what to do."
+            user_input="My three week old has a fever of 101 and I'm really scared."
         )
-        if not handed_off(result, HumanHandoffAgent):
-            result = await session.run(user_input="Please, can someone help me?")
         assert handed_off(result, HumanHandoffAgent)
-        assert state.handoff is not None and state.handoff.priority == "urgent"
+        assert state.handoff is not None
+        assert state.handoff.priority == "urgent"
+        assert state.handoff.reason == "clinical"
+        assert state.handoff.team == state.practice.team_for("clinical")
+        await final_message(result).judge(
+            judge,
+            intent="Acknowledges that the caller is worried and says they are being connected with staff now; gives no medical advice.",
+        )
 
 
 @pytest.mark.parametrize("practice_id", PRACTICES)

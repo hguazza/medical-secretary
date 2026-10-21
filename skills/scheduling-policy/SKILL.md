@@ -3,13 +3,13 @@ name: scheduling-policy
 description: Rules for booking, rescheduling and cancelling appointments over the phone for a medical practice. Use whenever a caller wants to make, move, check or cancel a visit, including vague requests like "can I come in this week".
 metadata:
   owner: medical-secretary
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 ### Before any scheduling action
 
 - Work only for a verified patient. If the patient isn't verified, the system verifies them first.
-- Find out the visit type in plain words, then map it to one of the practice's visit types. If unsure, ask one short question. A visit about new symptoms is a sick visit, not a checkup.
+- Find out the visit type in plain words, then map it to one of the practice's visit types. A visit about a symptom (a cough, fever, rash, pain) is a sick visit: use it without asking the caller to confirm. Ask one short question only when nothing the caller said points to a type, and ask it at most once; if it's still unclear, briefly say why the type matters and offer to transfer to staff.
 - New patients cannot be registered by phone yet. Offer to transfer them to staff.
 - Offer at most three options at a time, earliest first, with the day, date, time and provider. Never read out slot ids.
 

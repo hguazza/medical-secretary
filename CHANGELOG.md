@@ -32,4 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - An EHR outage during identity verification is now handed off as `system_error`, not `identity_not_verified`.
+- A caller describing an urgent symptom (such as a fever in a three-week-old) could be told "I'm connecting you" with no transfer, or be routed to the front desk instead of clinical staff because the agent invented a handoff reason. Handoff reasons are now a closed set, routing agents transfer without speaking first, and the transfer announcement (acknowledging a worried caller, stating an out-of-scope limit) is spoken by the Human Handoff agent; covered by a stricter first-turn eval and a new simulated caller.
+- Scheduling sometimes asked the caller to confirm "sick visit" when they had already described a symptom, and could repeat the visit-type question in a loop. The scheduling-policy playbook now infers a sick visit from symptoms and asks about visit type at most once before offering staff.
 - Unexpected exceptions in EHR tools are treated as system failures; invalid `practice_id` in job metadata falls back to the default and unknown practices are logged with the room; a failure to publish the handoff summary no longer blocks the caller's transfer message.
